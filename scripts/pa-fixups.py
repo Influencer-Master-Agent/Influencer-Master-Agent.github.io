@@ -33,6 +33,24 @@ Fixes:
   gallery         popup Content Gallery shows only posts that have a thumbnail;
                   an info tooltip says the thumbnails come from MX MAP
   disclaimer      page-foot disclaimer: generic wording, not the workbook-upload notes
+  brief           Brief Summary panel above Executive Summary (as on MX MAP)
+                  replaces the Rule-based Summary & Actions column; the E/R
+                  trend takes the full card width
+  contributors    Performance Contributors panel starts expanded
+  tutorial        Tutorial toggle in the page header; while on, each section shows
+                  a numbered "How to read this section" panel (copy: TUTORIAL)
+  no-list-cta     no "Find candidates via Recruiter Agent" button under the Long-list
+                  (the chat's button stays)
+  no-chat         no AI assistant button (and its chat) at the bottom right
+  mxmap           the report sections (head, Brief Summary, Executive Summary,
+                  Portfolio Overview, Deep Dive, Long-list, Contribution Map)
+                  are rendered by scripts/pa-mxmap.js: MX MAP's markup and class
+                  names over the bundle's data, styled by scripts/pa-mxmap.css
+  rail-limit      dragging the column divider never squeezes the main column
+                  under 690px (MX MAP's ReportLayout limit)
+  mxmap-css       that stylesheet, inlined as <style id="fx-mx">
+  map-log         Influencer Contribution Map plots E/R on a log scale too, with
+                  decade ticks on both axes (1M / 10M / 100M, 0.1% / 1%), as MX MAP does
   rail-menu       AIM rail: Influencer Master Agent brand in place of MX MAP; the three agents are
                   the top-level items (as in shared/flow-rail.js)
   css             the fx-fit stylesheet those hooks rely on
@@ -50,7 +68,7 @@ CSS = '''<style id="fx-fit">
    scripts/pa-fixups.py; edit there, not here. */
 .fx-tip { max-width: min(20rem, calc(100vw - 16px)); }
 .fx-wrap { overflow-wrap: break-word; }
-.fx-kpis { grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); }
+.fx-kpis { grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); }
 .fx-trend { grid-template-columns: repeat(auto-fit, minmax(min(100%, 96px), 1fr)); }
 .fx-scroll-x { overflow-x: auto; }
 .fx-po-table { min-width: 600px; }
@@ -63,12 +81,97 @@ CSS = '''<style id="fx-fit">
   .fx-bar-label { display: none; }
   .fx-bar-item { padding: 16px 10px; }
 }
+/* Brief Summary: measured off MX MAP's .ai-brief-summary. */
+.fx-brief {
+  padding: 16px 24px 24px; border: 2px solid #c9d3f8; border-radius: 12px;
+  background: linear-gradient(90deg, #f2f6ff, #f5f1fe);
+}
+.fx-brief-head { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; }
+.fx-brief-head img { width: 56px; height: 56px; flex: none; margin-left: -10px; }
+.fx-brief-head h2 { margin: 0; font: 700 26px/1.3 var(--mm-font-title); color: var(--color-text-default); }
+.fx-brief-surface { padding: 14px 16px; border: 1px solid #dfe4f1; border-radius: 4px; background: #fff; }
+.fx-brief-item { display: flex; min-width: 0; flex-direction: column; gap: 2px; overflow-wrap: break-word; }
+.fx-brief-item + .fx-brief-item { margin-top: 16px; padding-top: 16px; border-top: 1px solid #c9ced8; }
+.fx-brief-item h3 { margin: 0; font: 700 17px/1.4 var(--mm-font-body); color: #0b7cf4; }
+.fx-brief-item + .fx-brief-item h3 { color: #5a4fcf; }
+.fx-brief-item p { margin: 0; font: 400 17px/1.5 var(--mm-font-body); color: var(--color-text-default); }
+.fx-brief-item button {
+  align-self: flex-end; margin-top: 6px; padding: 0; border: 0; background: none; cursor: pointer; text-align: right;
+  font: 700 13px/1.4 var(--mm-font-body); color: #0b7cf4;
+}
+.fx-brief-item button:hover { text-decoration: underline; }
+/* Tutorial: panels exist only while the header toggle is on (html.fx-tut-on). */
+.fx-tut-toggle {
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; cursor: pointer; white-space: nowrap;
+  border: 1px solid var(--color-border-primary-2); border-radius: 8px; background: var(--color-surface-highest);
+  font: 700 14px/1 var(--mm-font-body); color: var(--color-text-primary-2);
+}
+.fx-tut-toggle[aria-pressed="true"] { background: var(--color-surface-primary); color: var(--color-text-inverse); }
+.fx-tut { display: none; margin-top: 12px; border-radius: 8px; background: var(--color-surface-highlight); }
+.fx-tut-on .fx-tut { display: block; }
+.fx-tut.fx-tut-side { margin: 12px 16px; }
+.fx-brief .fx-tut { margin: 0 0 12px; }
+.fx-tut summary {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; list-style: none;
+  font: 700 14px/1.4 var(--mm-font-body); color: var(--color-text-default);
+}
+.fx-tut summary::-webkit-details-marker { display: none; }
+.fx-tut summary::after {
+  content: ""; width: 7px; height: 7px; margin: 0 4px 3px auto; flex: none;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg);
+}
+.fx-tut[open] summary::after { margin-bottom: -3px; transform: rotate(-135deg); }
+.fx-tut-num {
+  display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex: none; border-radius: 50%;
+  background: var(--color-surface-primary); color: var(--color-text-inverse); font: 700 12px/1 var(--mm-font-body);
+}
+.fx-tut-body { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px 20px; padding: 4px 12px 14px 40px; }
+.fx-tut-body h4 { margin: 0 0 2px; font: 700 13px/1.4 var(--mm-font-body); color: var(--color-text-primary-2); }
+.fx-tut-body p { margin: 0; font: 400 14px/1.5 var(--mm-font-body); color: var(--color-text-default); overflow-wrap: break-word; }
 @media (max-width: 479px) {
+  .fx-tut-body { padding-left: 12px; }
   .fx-st-a { width: 5rem; }
   .fx-st-b { width: 5.5rem; }
   .fx-st-h { white-space: normal; line-height: 1.2; }
 }
 </style>'''
+
+
+# Tutorial copy, for first-time subsidiary marketers. One panel per section, in
+# reading order; each answers the same three questions.
+TUT_PARTS = ('What this shows', 'How to read it', 'What to do next')
+TUTORIAL = {
+    'brief': (
+        'The two things most worth knowing for this period, written by the AI from the numbers further down: how the latest month moved your cumulative E/R, and the one area holding it back.',
+        'The blue headline is the overall result and the purple one is the main issue. The sentence under each gives the figures behind it.',
+        'Start here. The link under the second headline takes you to Portfolio Overview with that group already selected, so you can check the evidence.',
+    ),
+    'exec': (
+        'The KPI cards show the latest month only: how many influencers were active, how much they posted, how many people those posts could reach (Po.Reach), how many engaged, and the resulting E/R. The trend below shows E/R accumulated from January.',
+        'E/R is Engagement ÷ Po.Reach, so it measures efficiency, not size. The badge on each card compares the latest month with the month before (MoM): blue is up, red is down. In the chart, the blue line is cumulative E/R month by month and the red dashed line is your target.',
+        'Check whether the blue line is closing in on the target. If Current YTD is lower than Prior Cumulative, the latest month pulled your E/R down, and the sections below show why.',
+    ),
+    'portfolio': (
+        'How your activity is split across groups. Use the switch on the right to group by Passion Point, Tier or Channel.',
+        'Compare the two bars in each row. Po.Reach Contribution is the group\'s share of your total reach; Engagement Contribution is its share of your total engagement. A group with a bigger reach share than engagement share is dragging E/R down. The reverse is lifting it.',
+        'Click a row to filter the Influencer Long-list to that group and see who is in it. Click the row again to clear the filter.',
+    ),
+    'map': (
+        'Every influencer as one dot. Further right means more Po.Reach; higher up means a better E/R. Switch to Passion Point or Tier to plot groups instead of people.',
+        'The two grey lines mark the median and split the map into four colour-coded quadrants. Top right is the ideal: big reach and strong E/R. Bottom right is big reach with weak E/R, which weighs most on your result. Both axes are log scale, so each gridline is 10× the one before.',
+        'Hover a dot for its exact figures. Click it to jump to that influencer in the Long-list.',
+    ),
+    'dive': (
+        'Who moved your numbers. Performance Change lists the influencers who pushed cumulative E/R down or up in the latest month. Performance Contributors ranks the top five by Po.Reach and by Engagement.',
+        'Impact on E/R is in percentage points (%p): -0.050%p means that influencer alone lowered your cumulative E/R by 0.05 points. In Contributors, compare each person\'s reach share with their engagement share, as in Portfolio Overview.',
+        'Click a row to jump to that influencer in the Long-list, or click their name to open their profile and recent posts.',
+    ),
+    'list': (
+        'Every influencer in the current selection, with archetype, tier, Po.Reach (and their share of the total) and E/R.',
+        'When a Passion Point is selected in Portfolio Overview, its name appears in brackets in the title. Use the Po.Reach and E/R headers to sort, and the Tier header to filter by tier.',
+        'Click a row to open that influencer\'s profile and recent posts. Compare the top and bottom of the E/R column to decide who to keep working with and who to review.',
+    ),
+}
 
 
 class Missing(Exception):
@@ -241,6 +344,219 @@ def fix_map_header(s):
     return s, True
 
 
+def fix_brief(s):
+    if 'className:"fx-brief"' in s:
+        return s, False
+    # The rule column closes the Executive Summary section and its component.
+    col = one(r',(' + ID + r')\.jsxs\("div",\{children:\[' + ID + r'\.jsxs\("div",\{className:"flex items-center gap-1\.5",children:\[' + ID +
+              r'\.jsx\(' + ID + r',\{children:"Rule-based Summary & Actions"\}\),.*?\]\}\),' + ID +
+              r'\.jsx\("div",\{className:"flex flex-col gap-2",children:(' + ID + r')\.map\((' + ID + r')=>' + ID + r'\.jsx\(' + ID +
+              r',\{rule:\3,onAction:\3\.id==="L-02"\?(' + ID + r'):void 0\},\3\.id\)\)\}\)\]\}\)(\]\}\)\]\}\))\}', s, 'rule column')
+    k, rules, act = col.group(1), col.group(2), col.group(4)
+    s = s[:col.start()] + col.group(5) + ']})}' + s[col.end():]
+    brief = (f'{k}.jsxs("section",{{className:"fx-brief","aria-label":"Brief Summary",children:['
+             f'{k}.jsxs("div",{{className:"fx-brief-head",children:[{k}.jsx("img",{{src:"resources/ai-summary.png",alt:""}}),'
+             f'{k}.jsx("h2",{{children:"Brief Summary"}})]}}),'
+             f'{k}.jsx("div",{{className:"fx-brief-surface",children:{rules}.map(fxR=>{k}.jsxs("article",{{className:"fx-brief-item",children:['
+             f'{k}.jsx("h3",{{children:fxR.title}}),{k}.jsx("p",{{children:fxR.evidence}}),'
+             f'fxR.id==="L-02"&&{k}.jsx("button",{{type:"button",onClick:{act},children:fxR.action}})]}},fxR.id))}})]}})')
+    sec = one(r'return (?=' + ID + r'\.jsxs\("section",\{style:\{\.\.\.' + ID + r',padding:' + ID + r'\.card\},children:\[' + ID +
+              r'\.jsxs\("div",\{className:"flex items-center gap-1\.5",children:\[' + ID + r'\.jsx\("h2",\{style:\{[^}]*\},children:"Executive Summary"\}\))', s, 'executive summary')
+    s = s[:sec.end()] + f'{k}.jsxs({k}.Fragment,{{children:[{brief},' + s[sec.end():]
+    for old, new, what in (
+        ('className:"mt-4 grid grid-cols-1 gap-4 border-t pt-4 lg:grid-cols-[1.05fr_1.3fr]"', 'className:"mt-4 border-t pt-4"', 'summary grid'),
+        ('latest performance, cumulative efficiency and rule-based actions', 'latest performance and cumulative efficiency', 'summary tooltip'),
+    ):
+        m = one(re.escape(old), s, what)
+        s = s[:m.start()] + new + s[m.end():]
+    return s, True
+
+
+def fix_contributors(s):
+    m = one(r'id:"performance-contributors",title:"Performance Contributors",(defaultOpen:!0,)?', s, 'contributors panel')
+    if m.group(1):
+        return s, False
+    return s[:m.end()] + 'defaultOpen:!0,' + s[m.end():], True
+
+
+def fix_tutorial(s):
+    if 'function FxTut(' in s:
+        return s, False
+    k = one(r'(' + ID + r')\.jsx\("h2",\{style:\{[^}]*\},children:"Executive Summary"\}\)', s, 'jsx runtime').group(1)
+    copy = json.dumps({key: {'n': n, 'parts': list(zip(TUT_PARTS, texts))}
+                       for n, (key, texts) in enumerate(TUTORIAL.items(), 1)}, ensure_ascii=False, separators=(',', ':'))
+
+    def panel(key, side=False):
+        return f'{k}.jsx(FxTut,{{id:"{key}"' + (',side:!0' if side else '') + '})'
+
+    # Insert after (or, with before=True, in front of) each section's anchor.
+    spots = [
+        ('brief', r'\.jsx\("h2",\{children:"Brief Summary"\}\)\]\}\)', False, False),
+        ('exec', r'children:"Executive Summary"\}\),' + ID + r'\.jsx\(' + ID + r',\{text:`[^`]*`\}\)\]\}\)', False, False),
+        ('portfolio', r'children:"Portfolio Overview".*?,(?=' + ID + r'\.jsxs?\("div",\{className:"mt-3 flex flex-wrap items-center gap-4")', True, False),
+        ('map', r'children:"Influencer Contribution Map".*?,(?=' + ID + r'\.jsxs?\("div",\{className:"mt-3 flex flex-wrap items-center gap-4")', True, False),
+        ('dive', r'children:"Influencer Deep Dive"\}\)\}\)', False, True),
+        ('list', r'children:' + ID + r'\("label"\)\}\),' + ID + r'\.jsx\("div",\{className:"mt-1 text-sm font-semibold",style:\{color:' + ID +
+                 r'\},children:' + ID + r'\?\?' + ID + r'\("all"\)\}\)\]\}\)', False, True),
+    ]
+    for key, pattern, before, side in spots:
+        m = one(pattern, s, f'tutorial {key}')
+        s = s[:m.end()] + (panel(key, side) + ',' if before else ',' + panel(key, side)) + s[m.end():]
+    ctl = one(r'children:\[(?=' + ID + r'\.jsx\(' + ID + r',\{value:' + ID + r',onChange:' + ID + r',placeholder:' + ID + r',maxDate:)', s, 'header controls')
+    s = (s[:ctl.end()] + f'{k}.jsx("button",{{type:"button",className:"fx-tut-toggle","aria-pressed":!1,onClick:fxTutToggle,children:"Tutorial"}}),' + s[ctl.end():])
+    dims = one(r'const ' + ID + r'=\["Influencer","Passion Point","Tier"\]', s, 'map dims')
+    s = (s[:dims.start()] +
+         'function fxTutToggle(e){e.currentTarget.setAttribute("aria-pressed",document.documentElement.classList.toggle("fx-tut-on"))}'
+         f'function FxTut({{id:e,side:t}}){{const a={copy}[e];return {k}.jsxs("details",{{className:"fx-tut"+(t?" fx-tut-side":""),open:a.n===1,children:['
+         f'{k}.jsxs("summary",{{children:[{k}.jsx("span",{{className:"fx-tut-num",children:a.n}}),"How to read this section"]}}),'
+         f'{k}.jsx("div",{{className:"fx-tut-body",children:a.parts.map(([r,n])=>{k}.jsxs("div",{{children:[{k}.jsx("h4",{{children:r}}),{k}.jsx("p",{{children:n}})]}},r))}})]}})}}' +
+         s[dims.start():])
+    return s, True
+
+
+def fix_no_list_cta(s):
+    fn = one(r'function (' + ID + r')\(\)\{return ' + ID + r'\.jsx\("div",\{className:"border-t px-4 py-3"[^;]*?"Find candidates via Recruiter Agent"', s, 'list cta').group(1)
+    calls = list(re.finditer(r',' + ID + r'\.jsx\(' + re.escape(fn) + r',\{\}\)', s))
+    if not calls:
+        return s, False
+    for m in reversed(calls):
+        s = s[:m.start()] + s[m.end():]
+    return s, True
+
+
+def fix_no_chat(s):
+    fn = one(r'function (' + ID + r')\(\)\{(?:(?!function ).)*?"AI Assistant is typing"', s, 'chat component').group(1)
+    calls = list(re.finditer(ID + r'\.jsx\(' + re.escape(fn) + r',\{\}\),', s))
+    if not calls:
+        return s, False
+    for m in reversed(calls):
+        s = s[:m.start()] + s[m.end():]
+    return s, True
+
+
+def fix_mxmap(s):
+    if 'function FxExec(' in s:
+        return s, False
+    g = lambda pattern, what, n=1: one(pattern, s, 'mxmap ' + what).group(n)
+    k = g(r'(' + ID + r')\.jsx\("h2",\{style:\{[^}]*\},children:"Executive Summary"\}\)', 'jsx runtime')
+    ytd = re.search(r'er:([\d.]+)\},\{\.\.\.' + ID + r',points:' + ID + r',currentYtdEr:\1\}', s)
+    line = one(ID + r'\.jsx\((' + ID + r'),\{width:"100%",height:140,children:' + ID + r'\.jsxs\((' + ID + r'),\{data:' + ID +
+               r',margin:\{top:8,right:12,bottom:0,left:0\},accessibilityLayer:!1,children:\[' + ID + r'\.jsx\((' + ID +
+               r'),\{strokeDasharray:"3 3",stroke:' + ID + r'\}\),' + ID + r'\.jsx\((' + ID + r'),\{dataKey:"month"', s, 'mxmap line chart')
+    tip = one(ID + r'\.jsx\((' + ID + r'),\{cursor:\{stroke:' + ID + r'\},content:' + ID + r'\.jsx\((' + ID + r'),\{\}\)\}\)', s, 'mxmap trend tooltip')
+    groups = one(r'==="Tier"\?(' + ID + r')\(' + ID + r',\[\.\.\.(' + ID + r')\],' + ID + r'=>' + ID + r'\.tier\):' + ID + r'==="Channel"\?\1\(' + ID +
+                 r',\[\.\.\.(' + ID + r')\],' + ID + r'=>' + ID + r'\.channel\):\1\(' + ID + r',\[\.\.\.(' + ID + r')\],' + ID + r'=>' + ID + r'\.pp\)', s, 'mxmap portfolio rows')
+    points = one(r'==="Tier"\?(' + ID + r')\(' + ID + r',\[\.\.\.' + ID + r'\],' + ID + r'=>' + ID + r'\.tier\):' + ID + r'==="Passion Point"\?\1\(' + ID +
+                 r',\[\.\.\.' + ID + r'\],' + ID + r'=>' + ID + r'\.pp\):(' + ID + r')\(' + ID + r'\)', s, 'mxmap map points')
+    popup = set(re.findall(r'\{bind:' + ID + r',portal:' + ID + r'\}=(' + ID + r')\(', s))
+    if len(popup) != 1:
+        raise Missing(f'mxmap popup hook: expected 1 name, found {len(popup)}')
+    names = {
+        'K': k, 'A': react_alias(s),
+        'LO': g(r'function ' + ID + r'\(\{text:(' + ID + r')\}\)\{return ' + ID + r'\.jsx\((' + ID + r'),\{text:\1,children:' + ID + r'\.jsx\(' + ID + r',\{name:"IconInfoSizeMedium"', 'tooltip', 2),
+        'NX': g(r'\.useMemo\(\(\)=>(' + ID + r')\((' + ID + r')\?\?(' + ID + r')\),\[\2,\3\]\)', 'trend builder'),
+        'YTD': ytd.group(1) if ytd else 'null',
+        'PX': g(r'\?(' + ID + r')\(\{priorEr:', 'rules'),
+        'RC': line.group(1), 'LINECHART': line.group(2), 'GRID': line.group(3), 'XAXIS': line.group(4),
+        'YAXIS': g(ID + r'\.jsx\((' + ID + r'),\{width:40,tickCount:4', 'y axis'),
+        'REFLINE': g(ID + r'\.jsx\((' + ID + r'),\{y:' + ID + r',stroke:' + ID + r'\.below,strokeWidth:1\.3', 'reference line'),
+        'TOOLTIP': tip.group(1), 'TRENDTIP': tip.group(2),
+        'LINE': g(ID + r'\.jsx\((' + ID + r'),\{type:"monotone",dataKey:"er"', 'line'),
+        'SCATTERCHART': g(ID + r'\.jsxs\((' + ID + r'),\{margin:\{top:16,right:16,bottom:8,left:4\},accessibilityLayer:!1', 'scatter chart'),
+        'SCATTER': g(ID + r'\.jsx\((' + ID + r'),\{data:' + ID + r'\.points,onClick:', 'scatter'),
+        'H4': groups.group(1), 'NL': groups.group(2), 'BA': groups.group(3), 'DA': groups.group(4),
+        'FT': points.group(1), 'XO': points.group(2),
+        'XW': g(r'\.useMemo\(\(\)=>(' + ID + r')\(' + ID + r'\),\[' + ID + r'\]\),' + ID + r'=' + ID + r'\.useMemo\(\(\)=>' + ID + r'\.filter\(' + ID + r'=>' + ID + r'\.impact<0\)', 'impact rows'),
+        'NO': popup.pop(),
+        'NS': g(r'function (' + ID + r')\(' + ID + r'\)\{const ' + ID + r'=' + ID + r'\[' + ID + r'\];if\(' + ID + r'\)return typeof ' + ID + r'=="string"\?' + ID + r':' + ID + r'\.src\}', 'avatar lookup'),
+        'U4': g(r'\.useMemo\(\(\)=>(' + ID + r')\(' + ID + r'\),\[' + ID + r'\]\),' + ID + r'=' + ID + r'\.useMemo\(\(\)=>' + ID + r'\(' + ID + r'\(' + ID + r',\{tier:' + ID + r'\}\)', 'list rows'),
+    }
+    code = (Path(__file__).resolve().parent / 'pa-mxmap.js').read_text(encoding='utf-8')
+    code = re.sub(r'__([A-Z0-9]+)__', lambda m: names[m.group(1)], code)
+    group = g(r'selectedGroup:(' + ID + r')&&\(\1\.axis==="tier"\|\|\1\.axis==="ppoint"\|\|\1\.axis==="channel"\)', 'selected group')
+    setter = g(r'(' + ID + r')\(\{axis:"ppoint",key:"Photography & Film"\}\)', 'group setter')
+
+    def swap(pattern, new, what):
+        nonlocal s
+        m = one(pattern, s, 'mxmap ' + what)
+        s = s[:m.start(1)] + new + s[m.end(1):]
+
+    # The report head leaves the left column and spans both, as on MX MAP.
+    head = one(ID + r'\.jsxs\("div",\{className:"flex items-start gap-3",children:\[' + ID + r'\.jsx\("div",\{className:"min-w-0 flex-1",children:' + ID +
+               r'\.jsx\(' + ID + r',\{scopeName:(.*?),periodLabel:(' + ID + r'),asOf:(' + ID + r')\}\)\}\),(' + ID + r')\.length>1&&' + ID +
+               r'\.jsx\("div",\{className:"shrink-0",children:' + ID + r'\.jsx\(' + ID + r',\{index:(.*?),total:(.*?),onChange:(' + ID + r')\}\)\}\)\]\}\),', s, 'mxmap report head')
+    h = head.groups()
+    s = s[:head.start()] + s[head.end():]
+    cols = one(ID + r'\.jsxs\("div",\{className:"flex flex-col gap-6 xl:flex-row xl:items-start",children:\[(' + ID +
+               r'\.jsx\("div",\{className:"flex min-w-0 flex-1 flex-col gap-6",children:(' + ID + r')\?' + ID +
+               r'\.jsxs\("div",\{className:")animate-in fade-in-0 flex flex-col gap-6"', s, 'mxmap columns')
+    s = (s[:cols.start()] + f'{k}.jsxs("div",{{className:"fx-mx subsidiary-performance-brief performance-analysis",children:[{cols.group(2)}&&'
+         f'{k}.jsx(FxHead,{{scopeName:{h[0]},periodLabel:{h[1]},asOf:{h[2]},pager:{h[3]}.length>1?{{index:{h[4]},total:{h[5]},onChange:{h[6]}}}:null}}),'
+         f'{k}.jsxs("div",{{className:"fx-mx-cols flex flex-col xl:flex-row xl:items-start",children:[' + cols.group(1) + 'animate-in fade-in-0 spa-main"' + s[cols.end():])
+    end = one(ID + r'&&' + ID + r'\.jsx\("div",\{className:"xl:hidden",children:' + ID + r'\(\)\}\)\]\}\)', s, 'mxmap columns end')
+    s = s[:end.end()] + ']})' + s[end.end():]
+
+    swap(ID + r'\.jsx\((' + ID + r'),\{scopeName:[^{}]*?,analysisRecords:' + ID + r',trendRecords:' + ID + r',benchmark:' + ID + r',onReviewPhotographyFilm:', 'FxExec', 'executive summary')
+    swap(ID + r'\.jsx\((' + ID + r'),\{analysisRecords:' + ID + r',selectedGroup:' + ID + r'&&\(' + ID + r'\.axis==="tier"\|\|' + ID + r'\.axis==="ppoint"\|\|' + ID + r'\.axis==="channel"\)', 'FxPortfolio', 'portfolio')
+    swap(r'=\(\)=>' + ID + r'\.jsx\((' + ID + r'),\{analysisRecords:' + ID + r',analysisRows:' + ID + r',selectedGroup:', 'FxMap', 'map')
+    swap(r'topSlot:' + ID + r'\?' + ID + r'\.jsx\((' + ID + r'),\{analysisRecords:' + ID + r',analysisRows:' + ID + r',onFocus:', 'FxDive', 'deep dive')
+    rail = one(ID + r'\.jsxs\("div",\{className:"overflow-hidden",style:' + ID + r',children:\[' + ID + r'\.jsx\(' + ID + r',\{records:', s, 'mxmap rail')
+    s = s[:rail.start()] + f'{k}.jsxs("div",{{className:"spa-rail",children:[{k}.jsx(FxList,{{group:{group},onClear:()=>{setter}(null),records:' + s[rail.end():]
+    for old, new, what in (
+        ('xl:w-[560px]', 'fx-mx-half', 'rail width'),
+        ('className:"hidden xl:block xl:-mx-3 xl:w-2.5 xl:shrink-0 xl:cursor-col-resize xl:self-stretch xl:rounded-full xl:bg-transparent xl:transition-colors hover:xl:bg-border"',
+         f'className:"spa-resize-handle fx-mx-handle",children:{k}.jsx("span",{{className:"spa-resize-handle__grip","aria-hidden":!0}})', 'resize handle'),
+    ):
+        m = one(re.escape(old), s, 'mxmap ' + what)
+        s = s[:m.start()] + new + s[m.end():]
+    dims = one(r'const ' + ID + r'=\["Influencer","Passion Point","Tier"\]', s, 'map dims')
+    return s[:dims.start()] + code + s[dims.start():], True
+
+
+def fix_rail_limit(s):
+    if '.offsetWidth??1e9)-720' in s:
+        return s, False
+    ref = one(r'\(\(' + ID + r'=(' + ID + r')\.current\)==null\?void 0:' + ID + r'\.offsetWidth\)\?\?440', s, 'rail ref').group(1)
+    m = one(r'Math\.min\(Math\.max\((' + ID + r'\+\(' + ID + r'-' + ID + r'\.clientX\)),360\),window\.innerWidth\*\.75\)', s, 'rail drag')
+    # 720 = 690px of main column + the 10px handle and its two 10px gaps.
+    new = f'Math.max(360,Math.min({m.group(1)},window.innerWidth*.75,({ref}.current?.parentElement?.offsetWidth??1e9)-720))'
+    return s[:m.start()] + new + s[m.end():], True
+
+
+def fix_mxmap_css(s):
+    css = '<style id="fx-mx">\n' + (Path(__file__).resolve().parent / 'pa-mxmap.css').read_text(encoding='utf-8') + '</style>'
+    block = re.search(r'<style id="fx-mx">.*?</style>', s, re.S)
+    if block:
+        if block.group(0) == css:
+            return s, False
+        return s[:block.start()] + css + s[block.end():], True
+    m = one(r'</head>', s, '</head>')
+    return s[:m.start()] + css + '\n' + s[m.start():], True
+
+
+def fix_map_log(s):
+    if 'fxDom(' in s:
+        return s, False
+    # Helpers: padded domain of the positive values; decade ticks inside it
+    # (recharts' own ticks when the domain spans fewer than two decades).
+    dims = one(r'const ' + ID + r'=\["Influencer","Passion Point","Tier"\]', s, 'map dims')
+    s = (s[:dims.start()] +
+         'function fxDom(v){v=v.filter(x=>x>0);return v.length?[Math.min(...v)*.7,Math.max(...v)*1.4]:[.1,10]}'
+         'function fxTicks(d){const t=[];for(let n=Math.ceil(Math.log10(d[0]));10**n<=d[1];n++)t.push(10**n);return t.length>1?t:void 0}' +
+         s[dims.start():])
+    x = one(r'scale:"log",domain:(' + ID + r'),allowDataOverflow:!0,tick:(' + ID + r'),tickFormatter:(' + ID + r'),', s, 'map x axis')
+    s = s[:x.start()] + f'scale:"log",domain:{x.group(1)},allowDataOverflow:!0,ticks:fxTicks({x.group(1)}),tick:{x.group(2)},tickFormatter:fxV=>{x.group(3)}(fxV).replace(".0",""),' + s[x.end():]
+    pts = one(r'\{data:(' + ID + r')\.points,onClick:', s, 'map points').group(1)
+    # E/R of 0 has no place on a log axis: it is drawn on the bottom edge, the tooltip keeps the real value.
+    y = one(r'\{type:"number",dataKey:"y",name:(' + ID + r'),unit:"%",tick:(' + ID + r'),tickFormatter:(' + ID + r')=>\3\.toFixed\(1\),(.*?position:"insideLeft",\.\.\.' + ID + r'\}\})', s, 'map y axis')
+    s = (s[:y.start()] + '(fxD=>({type:"number",dataKey:fxP=>Math.max(fxP.y,fxD[0]),name:' + y.group(1) +
+         ',unit:"%",scale:"log",domain:fxD,allowDataOverflow:!0,ticks:fxTicks(fxD),tick:' + y.group(2) +
+         ',tickFormatter:fxV=>+fxV.toPrecision(2),' + y.group(4) + f'))(fxDom({pts}.points.map(fxP=>fxP.y)))' + s[y.end():])
+    tip = one(r'X = \$\{(' + ID + r')\} \(log scale\), Y = \$\{(' + ID + r')\} — quadrants', s, 'map tooltip')
+    s = s[:tip.start()] + f'X = ${{{tip.group(1)}}}, Y = ${{{tip.group(2)}}} (both log scale) — quadrants' + s[tip.end():]
+    return s, True
+
+
 def fix_long_list(s):
     if 'fxZw=' in s:
         return s, False
@@ -383,7 +699,8 @@ FIXES = [
     ('portfolio', fix_portfolio), ('bars', fix_bars), ('deep-dive', fix_deep_dive),
     ('impact-column', fix_impact_column), ('top-bar', fix_top_bar), ('map-header', fix_map_header),
     ('long-list', fix_long_list), ('recruiter-cta', fix_recruiter_cta), ('er-decimal', fix_er_decimal),
-    ('gallery', fix_gallery), ('disclaimer', fix_disclaimer), ('rail-menu', fix_rail_menu), ('css', fix_css),
+    ('brief', fix_brief), ('contributors', fix_contributors), ('tutorial', fix_tutorial), ('no-list-cta', fix_no_list_cta), ('no-chat', fix_no_chat), ('map-log', fix_map_log), ('gallery', fix_gallery), ('disclaimer', fix_disclaimer), ('rail-menu', fix_rail_menu), ('css', fix_css),
+    ('mxmap', fix_mxmap), ('rail-limit', fix_rail_limit), ('mxmap-css', fix_mxmap_css),
 ]
 
 

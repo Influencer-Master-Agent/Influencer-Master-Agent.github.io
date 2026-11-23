@@ -1,0 +1,8 @@
+# GitHub Pages publishes only index.html, PA-tutorial-v1.html and resources/.
+# Everything listed here stays in the repository but is left out of the site.
+exclude:
+  - PA-demo-v4.html
+  - Influencer_Recruiter.html
+  - Brief_Curator.html
+  - scripts
+  - shared

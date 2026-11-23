@@ -7,9 +7,7 @@
 <!-- Influencer Master Agent · entry point. Hosts the flow in one full-window frame and
      mirrors where the frame is into this page's address, so a refresh or a
      shared link reopens the same agent and screen:
-       /#pa                 Performance Analyst (the default)
-       /#recruiter/detail   Influencer Recruiter, on its #detail view
-       /#brief/monitor      Brief Curator, on its #monitor view
+       /#pa                 Performance Analyst tutorial (the only page; any other address lands here)
      Each screen change and each move between agents is a history entry here
      (the frame itself adds none), so Back steps through screens, also after
      a refresh.
@@ -28,14 +26,14 @@
   flow.id = 'flow';
   flow.title = 'Influencer Master Agent';
   flow.name = 'flow-' + Date.now().toString(36) + Math.random().toString(36).slice(2);
-  var PAGES = { pa: 'PA-demo-v4.html', recruiter: 'Influencer_Recruiter.html', brief: 'Brief_Curator.html' };
+  var PAGES = { pa: 'PA-tutorial-v1.html' }; // the tutorial is the only page published (see _config.yml)
   // Views that move on by themselves; Back never stops on them.
   var TRANSIENT = ['generating', 'job-running'];
 
   // A place in the flow: agent, its view (the page's own #hash) and any query
   // the agent was opened with (PA hands the recruiter its search that way).
   function parse(hash) {
-    var m = /^#(pa|recruiter|brief)(?:\/([a-z-]+))?(\?[^#]*)?$/.exec(hash || '');
+    var m = /^#(pa)(?:\/([a-z-]+))?(\?[^#]*)?$/.exec(hash || '');
     return m ? { page: m[1], view: m[2] || '', search: m[3] || '' } : null;
   }
   function key(s) { return '#' + s.page + (s.view ? '/' + s.view : '') + s.search; }
