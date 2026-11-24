@@ -103,13 +103,13 @@ def walkthrough(st, target):
             f'That settles which passion point. The next question is who inside {drag[2]} is behind it.']},
         # Finding the person.
         {'target': '.spa-long-list', 'enter': 'showList', 'title': 'Who is inside it?', 'body': [
-            f'Selecting the passion point also filtered the Long-list. Its title now reads "Influencer Long-list ({drag[2]})" and it holds only that group\'s {len(group)} influencers. '
+            f'Selecting the passion point also filtered the Long-list. Its title now reads "Influencer Long-list ({drag[2]})" and it holds only that group\'s {len(group)} Influencers. '
             'Influencer Deep Dive is folded away for a moment so the list is in view.',
             f'Read the Po.Reach and E/R columns together. {top["name"]} alone carries {top["reach"] / group_reach * 100:.0f}% of the group\'s Po.Reach, at {top["er"]:.2f}% E/R. '
             f'The other {len(group) - 1} run from {min(g["er"] for g in rest):.2f}% to {max(g["er"] for g in rest):.2f}%.',
             'So the problem is not the passion point as a whole. It is one very large account inside it.']},
         {'target': '.spa-map-section', 'enter': 'showMap', 'mark': top['name'], 'title': 'See the same person on the map', 'body': [
-            'Here every influencer is a dot. Further right means more Po.Reach; higher up means a better E/R. The two grey lines are the medians, which split the map into four quadrants.',
+            'Here every Influencer is a dot. Further right means more Po.Reach; higher up means a better E/R. The two grey lines are the medians, which split the map into four quadrants.',
             f'{top["name"]} is the circled dot: furthest to the right and at the very bottom, alone in the "Low E/R · High Po.Reach" corner. That corner weighs most on your result, because a weak E/R is multiplied by a big audience.',
             f'Compare {best["name"]}, top right: a similar-sized audience, at {best["er"]:.2f}% E/R.']},
         {'target': '.spa-deep-details', 'enter': 'showChange', 'title': 'Measure the damage', 'body': [
@@ -119,7 +119,7 @@ def walkthrough(st, target):
             f'The other column shows it works both ways: {pos[0][1]} added {pos[0][0]:+.3f}%p.']},
         {'target': '.fx-mx ~ .fixed.inset-0 > div, .fixed.inset-0 > div', 'enter': 'showProfile', 'leave': 'closeProfile', 'plain': True, 'profile': top['name'],
          'title': 'Open their profile', 'body': [
-            f'Clicking a name opens that influencer\'s profile. The cards confirm the pattern for one person: {top["posts"]} posts, {top["reach_share"]:.1f}% of all Po.Reach, '
+            f'Clicking a name opens that Influencer\'s profile. The cards confirm the pattern for one person: {top["posts"]} posts, {top["reach_share"]:.1f}% of all Po.Reach, '
             f'but only {top["eng_share"]:.1f}% of all engagement, at {top["er"]:.2f}% E/R.',
             'Content Gallery below shows their tracked posts, and on the real page "Go to post" opens the original. This is where you look for the reason: the format, the topic, how the product appears.',
             'The numbers told you where to look. The posts tell you why.']},
@@ -127,7 +127,7 @@ def walkthrough(st, target):
         {'target': '.spa-long-list', 'enter': 'showList', 'title': 'Reach a resolution', 'body': [
             f"An analysis ends with a decision. Back in the Long-list, the evidence points to {top['name']}: {top['posts']} posts, {top['reach_share']:.1f}% of all Po.Reach, {top['er']:.2f}% E/R. There are two ways to resolve it.",
             "Keep them and fix the content. An audience this large is hard to replace. If the posts are the weak point, a sharper brief could lift E/R without giving up the reach.",
-            f"Or phase them out and find influencers similar to {alt['name']}, who runs at {alt['er']:.2f}% E/R in the same passion point. This audience does engage with the right creator.",
+            f"Or phase them out and find Influencers similar to {alt['name']}, who runs at {alt['er']:.2f}% E/R in the same passion point. This audience does engage with the right creator.",
             "Which one is right is your call. It depends on things this page cannot see: the contract, the relationship, the campaign plan."]},
         {'title': 'Two more agents are on the way', 'body': [
             "Both resolutions are about to get easier. Two more agents are in development for Influencer Master Agent.",
@@ -180,7 +180,7 @@ NOTICE = '''<style>
 <dialog class="fx-notice" id="fx-notice">
   <section aria-labelledby="fx-notice-1">
     <h2 id="fx-notice-1">This is a tutorial</h2>
-    <p>For this walkthrough, every influencer and every post on this page has been replaced with imaginary placeholders.</p>
+    <p>For this walkthrough, every Influencer and every post on this page has been replaced with imaginary placeholders.</p>
     <p>The names, photos, posts and figures are illustrative examples only. They do not represent real people or real performance.</p>
     <button type="button" data-next autofocus>Got it</button>
   </section>

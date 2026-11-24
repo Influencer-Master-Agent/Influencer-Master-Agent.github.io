@@ -147,7 +147,7 @@ TUTORIAL = {
         'Start here. The link under the second headline takes you to Portfolio Overview with that group already selected, so you can check the evidence.',
     ),
     'exec': (
-        'The KPI cards show the latest month only: how many influencers were active, how much they posted, how many people those posts could reach (Po.Reach), how many engaged, and the resulting E/R. The trend below shows E/R accumulated from January.',
+        'The KPI cards show the latest month only: how many Influencers were active, how much they posted, how many people those posts could reach (Po.Reach), how many engaged, and the resulting E/R. The trend below shows E/R accumulated from January.',
         'E/R is Engagement ÷ Po.Reach, so it measures efficiency, not size. The badge on each card compares the latest month with the month before (MoM): blue is up, red is down. In the chart, the blue line is cumulative E/R month by month and the red dashed line is your target.',
         'Check whether the blue line is closing in on the target. If Current YTD is lower than Prior Cumulative, the latest month pulled your E/R down, and the sections below show why.',
     ),
@@ -157,19 +157,19 @@ TUTORIAL = {
         'Click a row to filter the Influencer Long-list to that group and see who is in it. Click the row again to clear the filter.',
     ),
     'map': (
-        'Every influencer as one dot. Further right means more Po.Reach; higher up means a better E/R. Switch to Passion Point or Tier to plot groups instead of people.',
+        'Every Influencer as one dot. Further right means more Po.Reach; higher up means a better E/R. Switch to Passion Point or Tier to plot groups instead of people.',
         'The two grey lines mark the median and split the map into four colour-coded quadrants. Top right is the ideal: big reach and strong E/R. Bottom right is big reach with weak E/R, which weighs most on your result. Both axes are log scale, so each gridline is 10× the one before.',
-        'Hover a dot for its exact figures. Click it to jump to that influencer in the Long-list.',
+        'Hover a dot for its exact figures. Click it to jump to that Influencer in the Long-list.',
     ),
     'dive': (
-        'Who moved your numbers. Performance Change lists the influencers who pushed cumulative E/R down or up in the latest month. Performance Contributors ranks the top five by Po.Reach and by Engagement.',
-        'Impact on E/R is in percentage points (%p): -0.050%p means that influencer alone lowered your cumulative E/R by 0.05 points. In Contributors, compare each person\'s reach share with their engagement share, as in Portfolio Overview.',
-        'Click a row to jump to that influencer in the Long-list, or click their name to open their profile and recent posts.',
+        'Who moved your numbers. Performance Change lists the Influencers who pushed cumulative E/R down or up in the latest month. Performance Contributors ranks the top five by Po.Reach and by Engagement.',
+        'Impact on E/R is in percentage points (%p): -0.050%p means that Influencer alone lowered your cumulative E/R by 0.05 points. In Contributors, compare each person\'s reach share with their engagement share, as in Portfolio Overview.',
+        'Click a row to jump to that Influencer in the Long-list, or click their name to open their profile and recent posts.',
     ),
     'list': (
-        'Every influencer in the current selection, with archetype, tier, Po.Reach (and their share of the total) and E/R.',
+        'Every Influencer in the current selection, with archetype, tier, Po.Reach (and their share of the total) and E/R.',
         'When a Passion Point is selected in Portfolio Overview, its name appears in brackets in the title. Use the Po.Reach and E/R headers to sort, and the Tier header to filter by tier.',
-        'Click a row to open that influencer\'s profile and recent posts. Compare the top and bottom of the E/R column to decide who to keep working with and who to review.',
+        'Click a row to open that Influencer\'s profile and recent posts. Compare the top and bottom of the E/R column to decide who to keep working with and who to review.',
     ),
 }
 
@@ -623,7 +623,7 @@ RAIL_BRAND = ('<div style="display:flex;flex-direction:column;gap:4px">'
               '<span style="font-size:12px;font-weight:500;line-height:1.2;color:#0380FE">Samsung Electronics Marketing Platform</span></div>')
 
 
-GALLERY_TIP = ("Thumbnails are imported from MX MAP's influencer Content Gallery. "
+GALLERY_TIP = ("Thumbnails are imported from MX MAP's Influencer Content Gallery. "
                "Posts without a thumbnail there are not shown.")
 # A post has a thumbnail when the fetch shim can answer for it: an entry in
 # MX_THUMB_OVERRIDES (if this build has one) or a YouTube URL (i.ytimg.com).
@@ -654,7 +654,7 @@ def fix_gallery(s):
     return s[:m.start()] + new + s[m.end():], True
 
 
-DISCLAIMER = ["Figures are estimates based on tracked influencer content and may differ from platform-reported metrics.",
+DISCLAIMER = ["Figures are estimates based on tracked Influencer content and may differ from platform-reported metrics.",
               "AI-generated insights are for reference only and should be verified before use."]
 
 
